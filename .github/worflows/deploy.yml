@@ -21,8 +21,8 @@ jobs:
 
       - name: Build and Upload image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend-html:latest .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend-html:latest
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/helloworldaws:latest .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/helloworldaws:latest
 
       - name: Connect SSH and Deploy EC2
         uses: appleboy/ssh-action@v1.0.3
@@ -31,9 +31,9 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            echo "Updating image from Docker Hub..."
+            echo "Pulling latest image..."
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/helloworldaws:latest
-            echo "Stopping previous container (if one exists)..."
+            echo "Stopping and removing old container..."
             docker stop helloworldaws || true
             docker rm helloworldaws || true
             echo "Running new container..."
