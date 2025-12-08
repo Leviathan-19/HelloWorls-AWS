@@ -31,10 +31,27 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            echo "Pulling latest image..."
+            # Versión simplificada y eficiente
+            echo "🚀 Starting deployment..."
+            
+            # Detener y remover contenedor existente
+            docker stop helloworldaws 2>/dev/null || true
+            docker rm helloworldaws 2>/dev/null || true
+            
+            # Limpiar imágenes no usadas
+            docker image prune -a -f
+            
+            # Pull de la nueva imagen
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/helloworldaws:latest
-            echo "Stopping and removing old container..."
-            docker stop helloworldaws || true
-            docker rm helloworldaws || true
-            echo "Running new container..."
-            docker run -d -p 80:80 --name helloworldaws ${{ secrets.DOCKERHUB_USERNAME }}/helloworldaws:latest
+            
+            # Ejecutar con restart policy
+            docker run -d \
+              --name helloworldaws \
+              --restart always \
+              -p 80:80 \
+              ${{ secrets.DOCKERHUB_USERNAME }}/helloworldaws:latest
+            
+            # Verificación rápida
+            echo "✅ Deployment complete!"
+            echo "📦 Container status:"
+            docker ps --filter "name=helloworldaws" --format "{{.Names}}: {{.Status}}"
