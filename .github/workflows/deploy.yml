@@ -38,9 +38,6 @@ jobs:
             docker stop helloworldaws 2>/dev/null || true
             docker rm helloworldaws 2>/dev/null || true
             
-            # Limpiar imágenes no usadas
-            docker image prune -a -f
-            
             # Pull de la nueva imagen
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/helloworldaws:latest
             
@@ -55,3 +52,6 @@ jobs:
             echo "✅ Deployment complete!"
             echo "📦 Container status:"
             docker ps --filter "name=helloworldaws" --format "{{.Names}}: {{.Status}}"
+
+            # Limpiar imágenes no usadas
+            docker image prune -a -f
