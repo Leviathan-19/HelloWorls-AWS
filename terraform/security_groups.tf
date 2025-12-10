@@ -1,7 +1,8 @@
-resource "aws_security_group" "web" {
-  name        = "web_sg"
-  vpc_id      = aws_vpc.main.id
-  
+# Security group para el Load Balancer
+resource "aws_security_group" "lb" {
+  name   = "lb_sg"
+  vpc_id = aws_vpc.main.id
+
   ingress {
     from_port   = 80
     to_port     = 80
@@ -9,27 +10,6 @@ resource "aws_security_group" "web" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = length(var.ssh_allowed_cidr) > 0 ? [var.ssh_allowed_cidr] : []
-  }
-    egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  resource "aws_security_group" "alb" {
-  name   = "alb_sg"
-  vpc_id = aws_vpc.main.id
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
   egress {
     from_port   = 0
     to_port     = 0
@@ -38,5 +18,29 @@ resource "aws_security_group" "web" {
   }
 }
 
+# Security group para las instancias del ASG
+resource "aws_security_group" "web" {
+  name   = "web_sg"
+  vpc_id = aws_vpc.main.id
 
+  ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.lb.id]  # Solo permite tráfico desde el LB
+  }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = length(var.ssh_allowed_cidr) > 0 ? [var.ssh_allowed_cidr] : []
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }

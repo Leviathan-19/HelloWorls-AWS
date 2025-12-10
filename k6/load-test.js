@@ -4,20 +4,19 @@ import { check } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '1m', target: 50 },   // ramp up a 50 VUs en 1m
-    { duration: '2m', target: 200 },  // ramp up a 200 VUs en 2m
-    { duration: '5m', target: 200 },  // mantener 200 VUs por 5m
-    { duration: '2m', target: 0 },    // ramp down
+    { duration: '1m', target: 1000 },
+    { duration: '1m', target: 5000 },
+    { duration: '1m', target: 10000 },
   ],
   thresholds: {
-    http_req_duration: ['p(95)<2000'], // opcional: alerta si 95% > 2s
+    http_req_duration: ['p(95)<2000'],
   },
 };
 
-const url = __ENV.TARGET || 'http://hello-lb-1729891670.us-east-1.elb.amazonaws.com/';
+const url = __ENV.TARGET || 'http://hello-lb-1849340736.us-east-1.elb.amazonaws.com/';
 
 export default function () {
   const r = http.get(url);
   check(r, { 'status 200': (r) => r.status === 200 });
-  sleep(1);
+  //sleep(0.5);
 }
