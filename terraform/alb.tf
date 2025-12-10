@@ -1,10 +1,10 @@
 resource "aws_lb" "app" {
-  name = "hello-lb"
+  name               = "hello-lb"
   load_balancer_type = "application"
-  subnets = aws_subnet.public[*].id
+  subnets            = aws_subnet.public[*].id
+  security_groups    = [aws_security_group.alb.id]  # <-----
 }
 
-# Target group for the application instances
 resource "aws_lb_target_group" "app" {
   name     = "hello-tg"
   port     = 80
