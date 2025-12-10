@@ -11,27 +11,27 @@ variable "instance_type" {
 }
 
 variable "docker_image" {
-  description = "Dcoker image"
+  description = "Docker image"
   type        = string
 }
 
 variable "ami_id" {
-  description = "AMI a utilizar (Amazon Linux)"
+  description = "Ubuntu t3.micro"
   type        = string
-  default     = "ami-0c02fb55956c7d316"   # us-east-1
+  default     = "ami-08df7e9cff92a2aac"   # us-east-1
 }
 
 variable "min_capacity" {
   type    = number
-  default = 1
+  default = 3
 }
 
 variable "desired_capacity" {
   type    = number
-  default = 1
+  default = 3
 }
 
 variable "max_capacity" {
   type    = number
-  default = 4
+  default = 9
 }
