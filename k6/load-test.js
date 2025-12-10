@@ -14,7 +14,7 @@ export const options = {
   },
 };
 
-const url = __ENV.TARGET || 'http://TU-LOADBALANCER.amazonaws.com';
+const url = __ENV.TARGET || 'hello-lb-1729891670.us-east-1.elb.amazonaws.com';
 
 export default function () {
   const r = http.get(url);

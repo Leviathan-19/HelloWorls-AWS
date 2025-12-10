@@ -33,8 +33,5 @@ resource "aws_autoscaling_group" "app" {
       min_healthy_percentage = 50
       instance_warmup         = 120
     }
-
-    # Recreate instances when the launch template changes
-    triggers = ["launch_template"]
   }
 }

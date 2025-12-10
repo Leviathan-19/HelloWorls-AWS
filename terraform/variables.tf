@@ -36,3 +36,9 @@ variable "max_capacity" {
   type    = number
   default = 9
 }
+
+variable "ssh_allowed_cidr" {
+  description = "CIDR (x.x.x.x/32) allowed for SSH access. Leave empty to disable SSH ingress."
+  type        = string
+  default     = ""
+}

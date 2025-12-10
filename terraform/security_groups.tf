@@ -13,6 +13,6 @@ resource "aws_security_group" "web" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["x.x.x.x/32"]
+    cidr_blocks = length(var.ssh_allowed_cidr) > 0 ? [var.ssh_allowed_cidr] : []
   }
 }
