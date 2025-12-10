@@ -10,7 +10,6 @@ resource "aws_launch_template" "app" {
   vpc_security_group_ids = [aws_security_group.web.id]
 }
 
-
 resource "aws_autoscaling_group" "app" {
   max_size = 9
   min_size = 3
