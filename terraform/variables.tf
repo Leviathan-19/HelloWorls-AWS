@@ -13,6 +13,7 @@ variable "instance_type" {
 variable "docker_image" {
   description = "Docker image"
   type        = string
+  default     = "leviathan119/helloworld:latest"
 }
 
 variable "ami_id" {

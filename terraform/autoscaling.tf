@@ -2,6 +2,11 @@ resource "aws_launch_template" "app" {
   name_prefix   = "hello"
   image_id      = "ami-08df7e9cff92a2aac"
   instance_type = "t3.micro"
+  key_name      = "nginx-server-ssh"
+  
+  network_interfaces {
+    security_groups = [aws_security_group.web.id]
+  }
 }
 
 
@@ -16,4 +21,5 @@ resource "aws_autoscaling_group" "app" {
   }
 
   vpc_zone_identifier = aws_subnet.public[*].id
+  target_group_arns   = [aws_lb_target_group.app.arn]
 }
