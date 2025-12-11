@@ -13,7 +13,7 @@ export const options = {
   },
 };
 
-const url = __ENV.TARGET || 'http://hello-lb-1849340736.us-east-1.elb.amazonaws.com/';
+const url = __ENV.TARGET || 'http://hello-lb-1284938582.us-east-1.elb.amazonaws.com/';
 
 export default function () {
   const r = http.get(url);
