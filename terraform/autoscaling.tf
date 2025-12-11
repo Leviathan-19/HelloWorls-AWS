@@ -1,3 +1,7 @@
+###########################################################################
+########################## LAUNCH TEMPLATE ################################
+###########################################################################
+
 resource "aws_launch_template" "app" {
   name_prefix   = "hello"
   image_id      = "ami-08df7e9cff92a2aac"
@@ -7,10 +11,14 @@ resource "aws_launch_template" "app" {
   vpc_security_group_ids = [aws_security_group.web.id]
 }
 
+###########################################################################
+########################## AUTO SCALING GROUP #############################
+###########################################################################
+
 resource "aws_autoscaling_group" "app" {
   max_size          = 10
-  min_size          = 3
-  desired_capacity  = 3
+  min_size          = 2
+  desired_capacity  = 2
 
   launch_template {
     id      = aws_launch_template.app.id
@@ -19,6 +27,9 @@ resource "aws_autoscaling_group" "app" {
 
   vpc_zone_identifier = aws_subnet.public[*].id
   target_group_arns   = [aws_lb_target_group.app.arn]
+
+  health_check_type         = "ELB"
+  health_check_grace_period = 120
 
   instance_refresh {
     strategy = "Rolling"
@@ -29,16 +40,18 @@ resource "aws_autoscaling_group" "app" {
     }
   }
 
-  # Etiquetas útiles para identificar instancias
   tag {
     key                 = "Name"
     value               = "hello-app-instance"
     propagate_at_launch = true
   }
 }
+###########################################################################
+#################### POLICY AUTOSCALING BY CPU ############################
+###########################################################################
 
-resource "aws_autoscaling_policy" "scale_on_cpu" {
-  name                   = "scale-out-on-high-cpu"
+resource "aws_autoscaling_policy" "cpu_tracking" {
+  name                   = "scale-on-cpu"
   autoscaling_group_name = aws_autoscaling_group.app.name
   policy_type            = "TargetTrackingScaling"
 
@@ -46,12 +59,19 @@ resource "aws_autoscaling_policy" "scale_on_cpu" {
     predefined_metric_specification {
       predefined_metric_type = "ASGAverageCPUUtilization"
     }
-    target_value = 70.0
+
+    target_value = 40   # Baja CPU = reduce instancias
   }
+
+  estimated_instance_warmup = 120
 }
 
-resource "aws_autoscaling_policy" "scale_on_request_count" {
-  name                   = "scale-out-on-high-request-count"
+#############################
+# POLICY 2: ESCALAR POR REQUEST COUNT (ALB)
+#############################
+
+resource "aws_autoscaling_policy" "requests_tracking" {
+  name                   = "scale-on-requests"
   autoscaling_group_name = aws_autoscaling_group.app.name
   policy_type            = "TargetTrackingScaling"
 
@@ -60,6 +80,10 @@ resource "aws_autoscaling_policy" "scale_on_request_count" {
       predefined_metric_type = "ALBRequestCountPerTarget"
       resource_label         = "${aws_lb.app.arn_suffix}/${aws_lb_target_group.app.arn_suffix}"
     }
-    target_value = 500.0
+
+    target_value = 10     # MENOS DE 10 peticiones por instancia = elimina instancias
   }
+
+  estimated_instance_warmup = 120
 }
+
